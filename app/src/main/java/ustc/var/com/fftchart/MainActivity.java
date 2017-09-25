@@ -29,7 +29,8 @@ public class MainActivity extends Activity {
     private boolean isSR = false;
 
     protected static final int SIZE = 20;
-
+    protected static final float SMALL_SCALE = 200;
+    protected static final float LARGE_SCALE = 200000;
 
 
     // On create

@@ -96,18 +96,21 @@ public class Spectrum extends View {
             Canvas c = new Canvas(graticule);
 
             // Black background
-            c.drawColor(Color.BLACK);
+            c.drawColor(Color.WHITE);
 
             // Set up paint
             paint.setStrokeWidth(2);
             paint.setAntiAlias(false);
             paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.argb(255, 0, 63, 0));
+            paint.setColor(getResources().getColor(R.color.colorBackground));
 
             // Draw graticule
-            float fa[] = {1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f,
-                    1.9f, 2, 2.2f, 2.5f, 3, 3.5f, 4, 4.5f, 5, 6, 7, 8, 9
-            };
+//            float fa[] = {1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f,
+//                    1.9f, 2, 2.2f, 2.5f, 3, 3.5f, 4, 4.5f, 5, 6, 7, 8, 9
+//            };
+
+            //画背景竖线
+            float fa[] = {1, 2, 5};
             float ma[] = {1, 10, 100, 1000, 10000};
             for (float m : ma) {
                 for (float f : fa) {
@@ -116,7 +119,8 @@ public class Spectrum extends View {
                 }
             }
 
-            for (int i = 0; i < height; i += MainActivity.SIZE) {
+            //画背景横线
+            for (int i = 0; i < height; i += MainActivity.SIZE *5) {
                 c.drawLine(0, i, width, i, paint);
             }
         }
@@ -211,7 +215,7 @@ public class Spectrum extends View {
             fillPath.close();
 
             // Colour translucent green
-            paint.setColor(Color.argb(63, 0, 255, 0));
+            paint.setColor(Color.argb(63, 255, 0, 0));
             paint.setStyle(Paint.Style.FILL);
 
             // Fill path
@@ -220,7 +224,7 @@ public class Spectrum extends View {
 
 
         // Color green
-        paint.setColor(Color.GREEN);
+        paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.STROKE);
 
         // Draw path

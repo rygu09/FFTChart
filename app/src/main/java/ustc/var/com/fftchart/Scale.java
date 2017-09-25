@@ -81,14 +81,21 @@ public class Scale extends View
         canvas.scale(1, -1);
 
         // Draw scale ticks
-        for (int i = 0; i < height; i += MainActivity.SIZE)
-        {
+
+        for (int i = 0; i < height; i += MainActivity.SIZE * 5) {
             canvas.drawLine(width * 2 / 3, i, width, i, paint);
+
         }
 
-        for (int i = 0; i < height; i += MainActivity.SIZE * 5)
-        {
-            canvas.drawLine(width / 3, i, width, i, paint);
-        }
+//        String s = String.format(Locale.getDefault(),
+//                "%1.0f", f * m);
+//
+//        paint.setAntiAlias(true);
+//        canvas.drawText(s, x, height - (height / 6), paint);
+//        paint.setAntiAlias(false);
+//        paint.setAntiAlias(true);
+//        canvas.drawText(s, 0, width * 2 / 3, paint);
+
+
     }
 }

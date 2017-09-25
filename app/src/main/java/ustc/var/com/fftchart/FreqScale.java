@@ -35,7 +35,7 @@ import java.util.Locale;
 // FreqScale
 public class FreqScale extends View
 {
-    private static final int HEIGHT_FRACTION = 32;
+    private static final int HEIGHT_FRACTION = 16;
     private int width;
     private int height;
 
@@ -126,7 +126,7 @@ public class FreqScale extends View
                 for (float s : sa)
                 {
                     float x = (float) Math.log((s * m) / audio.fps) / scale;
-                    canvas.drawLine(x, 0, x, height / 4, paint);
+                    canvas.drawLine(x, 0, x, height / 6, paint);
                 }
             }
         }
