@@ -94,17 +94,15 @@ public class FreqScale extends View
             // Draw ticks
             canvas.drawLine(0, 0, 0, height / 3, paint);
 
-            float fa[] = {1, 2, 5};
-            float sa[] = {1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f,
-                          1.9f, 2.2f, 2.5f, 3, 3.5f, 4, 4.5f, 6, 7, 8, 9
-                         };
-            float ma[] = {10, 100, 1000, 10000};
+            float fa[] = {1};
+            float sa[] = {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f };
+            float ma[] = {100, 1000, 10000};
             for (float m : ma)
             {
                 for (float f : fa)
                 {
-                    if ((f == 1) && (m == 10))
-                        continue;
+//                    if ((f == 1) && (m == 10))
+//                        continue;
 
                     float x = (float) Math.log((f * m) / audio.fps) / scale;
                     canvas.drawLine(x, 0, x, height / 3, paint);
@@ -131,6 +129,6 @@ public class FreqScale extends View
             }
         }
 
-        canvas.drawText("freq", 0, height - (height / 6), paint);
+//        canvas.drawText("freq", 0, height - (height / 6), paint);
     }
 }

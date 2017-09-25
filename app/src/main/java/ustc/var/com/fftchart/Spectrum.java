@@ -110,7 +110,7 @@ public class Spectrum extends View {
 //            };
 
             //画背景竖线
-            float fa[] = {1, 2, 5};
+            float fa[] = {1};
             float ma[] = {1, 10, 100, 1000, 10000};
             for (float m : ma) {
                 for (float f : fa) {

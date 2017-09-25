@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">FFT Chart</string>
     <string name="spectrum">Spectrum</string>
+    <string name="frequency_unit">[ Hz ]</string>
+
 
     <string name="error_buffer">Error from audio recording! Cannot find a working input sample rate.</string>
     <string name="error_init">Audio recorder not initialised! Maybe a working input sample rate could not be found.</string>

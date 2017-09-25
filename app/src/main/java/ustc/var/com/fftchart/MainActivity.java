@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 
         spectrum = (Spectrum) findViewById(R.id.spectrum);
         scale = (FreqScale) findViewById(R.id.freqscale);
-        unit = (Unit) findViewById(R.id.specunit);
+//        unit = (Unit) findViewById(R.id.specunit);
 
         if (unit != null)
             unit.scale = 0;

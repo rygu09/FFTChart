@@ -29,15 +29,9 @@
       android:layout_height="wrap_content"
       android:layout_alignLeft="@id/spectrum"
       android:layout_alignParentRight="true"
-      android:layout_alignParentBottom="true" />
+      android:layout_alignParentBottom="true"/>
 
-  <ustc.var.com.fftchart.Unit
-      android:id="@+id/specunit"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_below="@id/scale"
-      android:layout_toLeftOf="@id/freqscale"
-      android:layout_alignParentLeft="true"
-      android:layout_alignParentBottom="true" />
+
+
 
 </RelativeLayout>
