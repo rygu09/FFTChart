@@ -32,8 +32,6 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
 
-import java.util.Locale;
-
 // Spectrum
 public class Spectrum extends View {
     private int width;
@@ -141,6 +139,7 @@ public class Spectrum extends View {
         max = 0.0f;
 
         // Rewind path
+        //path.rewind():清除掉path里的线条和曲线，但是会保留内部的数据结构以便重用；
         path.rewind();
         path.moveTo(0, 0);
 
@@ -179,12 +178,12 @@ public class Spectrum extends View {
             last = index;
 
             // Get max value
-            if (max < value)
-                max = value;
+//            if (max < value)
+//                max = value;
 
-            float y = value * yscale;
+            float y = value * yscale;//float yscale = (height / max);
 
-            path.lineTo(x, y);
+            path.lineTo(x, y);//lineTo(float x, float y) //添加当前点到目标点（x，y）构成的直线到path
         }
 
         paint.setAntiAlias(true);
@@ -230,23 +229,23 @@ public class Spectrum extends View {
         // Draw path
         canvas.drawPath(path, paint);
 
-        if (audio.frequency > 0.0) {
-            // Yellow pen for frequency trace
-            paint.setColor(Color.YELLOW);
-
-            // Create line for frequency
-            float x = (float) Math.log(audio.frequency / audio.fps) / xscale;
-            paint.setAntiAlias(false);
-            canvas.drawLine(x, 0, x, height / 4, paint);
-
-            // Draw frequency value
-            canvas.scale(1, -1);
-            String s = String.format(Locale.getDefault(), "%1.1fHz",
-                    audio.frequency);
-            paint.setTextSize(height / 48);
-            paint.setTextAlign(Paint.Align.CENTER);
-            paint.setAntiAlias(true);
-            canvas.drawText(s, x, 0, paint);
-        }
+//        if (audio.frequency > 0.0) {
+//            // Yellow pen for frequency trace
+//            paint.setColor(Color.YELLOW);
+//
+//            // Create line for frequency
+//            float x = (float) Math.log(audio.frequency / audio.fps) / xscale;
+//            paint.setAntiAlias(false);
+//            canvas.drawLine(x, 0, x, height / 4, paint);
+//
+//            // Draw frequency value
+//            canvas.scale(1, -1);
+//            String s = String.format(Locale.getDefault(), "%1.1fHz",
+//                    audio.frequency);
+//            paint.setTextSize(height / 48);
+//            paint.setTextAlign(Paint.Align.CENTER);
+//            paint.setAntiAlias(true);
+//            canvas.drawText(s, x, 0, paint);
+//        }
     }
 }

@@ -25,23 +25,27 @@ package ustc.var.com.fftchart;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.Locale;
+
 // Scale
-public class Scale extends View
-{
-    private static final int WIDTH_FRACTION = 24;
+public class Scale extends View {
+    private static final int WIDTH_FRACTION = 16;
 
     private int width;
     private int height;
 
     private Paint paint;
 
+    protected MainActivity.Audio audio;
+
+
     // Constructor
-    public Scale(Context context, AttributeSet attrs)
-    {
+    public Scale(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         // Create paint
@@ -50,8 +54,7 @@ public class Scale extends View
 
     // onMeasure
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         // Get offered dimension
@@ -63,8 +66,7 @@ public class Scale extends View
 
     // onSizeChanged
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh)
-    {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
         // Get actual dimensions
@@ -73,19 +75,41 @@ public class Scale extends View
     }
 
     @Override
-    protected void onDraw(Canvas canvas)
-    {
+    protected void onDraw(Canvas canvas) {
         paint.setStrokeWidth(2);
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(width * 1 / 2);
+//        paint.setTextAlign(Paint.Align.RIGHT);
+//        canvas.translate(0, height);
+//        canvas.scale(1, -1);
 
-        canvas.translate(0, height);
-        canvas.scale(1, -1);
 
+
+        int index = 0;
         // Draw scale ticks
 
-        for (int i = 0; i < height; i += MainActivity.SIZE * 5) {
-            canvas.drawLine(width * 2 / 3, i, width, i, paint);
+        float yscale = 100 / height;
 
+//        float[] amplitude = {0,20, 40, 60, 80, 100,120,140,160};
+        float[] amplitude = {120, 100, 80, 60, 40, 20, 0};
+
+
+//        for (float a : amplitude) {
+//            float y = (float) (a / audio.fps / yscale);
+//            String s = String.format(Locale.getDefault(),
+//                    "%1.0f", a);
+//            canvas.drawText(s, y, 0, paint);
+//        }
+
+        for (int i = 4; i < height; i += MainActivity.SIZE *5) {
+
+//            canvas.drawLine(width * 4 / 5, i, width, i, paint);
+            String s = String.format(Locale.getDefault(),
+                    "%1.0f", (float)amplitude[index]);
+            canvas.drawText(s, 0, i, paint);
+            index++;
         }
+
 
 //        String s = String.format(Locale.getDefault(),
 //                "%1.0f", f * m);
@@ -99,3 +123,5 @@ public class Scale extends View
 
     }
 }
+
+

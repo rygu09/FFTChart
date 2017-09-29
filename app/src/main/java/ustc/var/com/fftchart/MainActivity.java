@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 public class MainActivity extends Activity {
 
     private Spectrum spectrum;
@@ -42,6 +44,7 @@ public class MainActivity extends Activity {
         spectrum = (Spectrum) findViewById(R.id.spectrum);
         scale = (FreqScale) findViewById(R.id.freqscale);
 //        unit = (Unit) findViewById(R.id.specunit);
+        text = findViewById(R.id.textView2);
 
         if (unit != null)
             unit.scale = 0;
@@ -512,6 +515,7 @@ public class MainActivity extends Activity {
                 }
 
                 // Do a full process run every N
+                //每N个点计算一次
                 if (++counter % N != 0)
                     continue;
 
@@ -520,9 +524,13 @@ public class MainActivity extends Activity {
                     continue;
 
                 // Update spectrum
+                // 重绘
+//                postInvalidate(); 与invalidate()方法区别就是，postInvalidate()方法可以在UI线程执行，也可以在工作线程执行
+//                而invalidate()只能在UI线程操作。但是从重绘速率讲：invalidate()效率高。
                 spectrum.postInvalidate();
 
                 // Update frequency and dB every M
+                //每M个点重绘一次
                 if (counter % M != 0)
                     continue;
 
@@ -540,16 +548,40 @@ public class MainActivity extends Activity {
                 // Level
                 double level = 0.0;
 
+
+
                 for (int i = 0; i < STEP; i++)
-                    level += ((double) data[i] / 32768.0) *
-                            ((double) data[i] / 32768.0);
+                    level += ((double) data[i] /1) *
+                            ((double) data[i] / 1);
 
-                level = Math.sqrt(level / STEP) * 2.0;
+                level = level / STEP;
 
-                double dB = Math.log10(level) * 20.0;
+                double dB = Math.log10(level) * 10.0;
 
-                if (dB < -80.0)
-                    dB = -80.0;
+
+                final String s = String.format(Locale.getDefault(),
+                        "%1.1fdB", dB);
+                text.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        text.setText(s);
+                    }
+                });
+
+
+
+
+//                //16bit采样 2的16次方/2=32768
+//                for (int i = 0; i < STEP; i++)
+//                    level += ((double) data[i] / 32768.0) *
+//                            ((double) data[i] / 32768.0);
+//
+//                level = Math.sqrt(level / STEP) * 2.0;
+//
+//                double dB = Math.log10(level) * 20.0;
+//
+//                if (dB < -80.0)
+//                    dB = -80.0;
 
 //                // Update frequency and dB display
 //                if (max > MIN) {
