@@ -291,13 +291,13 @@ public class MainActivity extends Activity {
 
         // Constructor
         public Audio() {
-            data = new short[STEP];  //STEP = SAMPLES / OVERSAMPLE
-            buffer = new double[SAMPLES];
+            data = new short[STEP];  /**  data[1024]     STEP = SAMPLES / OVERSAMPLE  */
+            buffer = new double[SAMPLES];/**  buffer[4096]   */
 
-            xr = new double[SAMPLES];
-            xi = new double[SAMPLES];
+            xr = new double[SAMPLES];/**  xr[4096]   */
+            xi = new double[SAMPLES];/**  xi[4096]   */
 
-            xa = new double[RANGE];
+            xa = new double[RANGE];/**  xa[2048]   */
             xp = new double[RANGE];
             xf = new double[RANGE];
         }
@@ -345,6 +345,7 @@ public class MainActivity extends Activity {
         protected void processAudio() {
             // Assume the output sample will work on the input as
             // there isn't an AudioRecord.getNativeInputSampleRate()
+            /*****  44100  *******/
             sample =
                     AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC);
 
@@ -377,7 +378,6 @@ public class MainActivity extends Activity {
                                 AudioFormat.ENCODING_PCM_16BIT,
                                 size);
             }
-
             // Exception
             catch (Exception e) {
                 runOnUiThread(new Runnable() {
@@ -424,7 +424,7 @@ public class MainActivity extends Activity {
             }
 
             // Calculate fps
-            fps = (double) sample / SAMPLES;
+            fps = (double) sample / SAMPLES;/*********  44100/4096 **********/
 
             // Start recording
             audioRecord.startRecording();
@@ -435,6 +435,9 @@ public class MainActivity extends Activity {
             // Continue until the thread is stopped
             while (thread != null) {
                 // Read a buffer of data
+                /**
+                 * 每次从buffer[4096]中读1024个点
+                 */
                 size = audioRecord.read(data, 0, STEP);
 
                 // Stop the thread if no data or error state
@@ -442,7 +445,9 @@ public class MainActivity extends Activity {
                     thread = null;
                     break;
                 }
-
+/**
+ * 应该是为了更新数据,每次将buffer[]中的后SAMPLE-STEP移到开始,data[i]给后STEP个数据
+ */
                 // Move the main data buffer up
                 //将buffer中的从STEP开始的SAMPLES - STEP长度的数据拷贝
                 //拷贝位置是buffer中的0位开始
@@ -472,7 +477,7 @@ public class MainActivity extends Activity {
                     double window =
                             0.5 - 0.5 * Math.cos(2.0 * Math.PI *
                                     i / SAMPLES);
-
+/******* 将buffer[i]赋值给xr[i] ********/
                     // Normalise and window the input data
                     xr[i] = buffer[i] / norm * window;
                 }
@@ -523,10 +528,10 @@ public class MainActivity extends Activity {
                 if (lock)
                     continue;
 
-                // Update spectrum
-                // 重绘
-//                postInvalidate(); 与invalidate()方法区别就是，postInvalidate()方法可以在UI线程执行，也可以在工作线程执行
-//                而invalidate()只能在UI线程操作。但是从重绘速率讲：invalidate()效率高。
+/**重绘  Update spectrum
+ * postInvalidate(); 与invalidate()方法区别就是，postInvalidate()方法可以在UI线程执行，也可以在工作线程执行
+   而invalidate()只能在UI线程操作。但是从重绘速率讲：invalidate()效率高。
+  */
                 spectrum.postInvalidate();
 
                 // Update frequency and dB every M
@@ -547,18 +552,14 @@ public class MainActivity extends Activity {
 
                 // Level
                 double level = 0.0;
-
-
-
+/**
+ * 计算1024个点的平均dB值
+ */
                 for (int i = 0; i < STEP; i++)
                     level += ((double) data[i] /1) *
                             ((double) data[i] / 1);
-
                 level = level / STEP;
-
                 double dB = Math.log10(level) * 10.0;
-
-
                 final String s = String.format(Locale.getDefault(),
                         "%1.1fdB", dB);
                 text.post(new Runnable() {
@@ -567,10 +568,6 @@ public class MainActivity extends Activity {
                         text.setText(s);
                     }
                 });
-
-
-
-
 //                //16bit采样 2的16次方/2=32768
 //                for (int i = 0; i < STEP; i++)
 //                    level += ((double) data[i] / 32768.0) *
@@ -614,6 +611,11 @@ public class MainActivity extends Activity {
             cleanUpAudioRecord();
         }
 
+        /**
+         * 这里是fft处理
+         * @param ar
+         * @param ai
+         */
         // Real to complex FFT, ignores imaginary values in input array
         //ar是实部，ai是虚部
         private void fftr(double ar[], double ai[]) {
