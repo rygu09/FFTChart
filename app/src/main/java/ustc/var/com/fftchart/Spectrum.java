@@ -30,7 +30,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.Locale;
 
 // Spectrum
 public class Spectrum extends View {
@@ -48,6 +51,10 @@ public class Spectrum extends View {
     protected MainActivity.Audio audio;
 
     private boolean isSR = false;
+
+    protected float index;
+    protected float start;
+
 
     // Spectrum
     public Spectrum(Context context, AttributeSet attrs) {
@@ -76,6 +83,9 @@ public class Spectrum extends View {
     // On draw
     @Override
     protected void onDraw(Canvas canvas) {
+
+
+
         // Check for data
         if ((audio == null) || (audio.xa == null)) {
             canvas.drawColor(Color.BLACK);
@@ -118,7 +128,7 @@ public class Spectrum extends View {
             }
 
             //画背景横线
-            for (int i = 0; i < height; i += MainActivity.SIZE *5) {
+            for (int i = 0; i < height; i += MainActivity.SIZE * 5) {
                 c.drawLine(0, i, width, i, paint);
             }
         }
@@ -145,6 +155,7 @@ public class Spectrum extends View {
 
         // Create trace
         int last = 1;
+        float[] value_arr=new float[Math.round(width)];
         for (int x = 0; x < width; x++) {
             float value = 0.0f;
 
@@ -181,6 +192,7 @@ public class Spectrum extends View {
 //            if (max < value)
 //                max = value;
 
+            value_arr[x]=value*yscale;
             float y = value * yscale;//float yscale = (height / max);
 
             path.lineTo(x, y);//lineTo(float x, float y) //添加当前点到目标点（x，y）构成的直线到path
@@ -206,20 +218,19 @@ public class Spectrum extends View {
 //        }
 
         //始终填充
-            // Copy path
-            fillPath.set(path);
+        // Copy path
+        fillPath.set(path);
 
-            // Complete path for fill
-            fillPath.lineTo(width, 0);
-            fillPath.close();
+        // Complete path for fill
+        fillPath.lineTo(width, 0);
+        fillPath.close();
 
-            // Colour translucent green
-            paint.setColor(Color.argb(63, 255, 0, 0));
-            paint.setStyle(Paint.Style.FILL);
+        // Colour translucent green
+        paint.setColor(Color.argb(63, 255, 0, 0));
+        paint.setStyle(Paint.Style.FILL);
 
-            // Fill path
-            canvas.drawPath(fillPath, paint);
-
+        // Fill path
+        canvas.drawPath(fillPath, paint);
 
 
         // Color green
@@ -229,9 +240,68 @@ public class Spectrum extends View {
         // Draw path
         canvas.drawPath(path, paint);
 
+        // Draw index
+        if (index > 0 && index < width)
+        {
+            // Yellow index
+            paint.setColor(Color.BLACK);
+
+            paint.setAntiAlias(false);
+            canvas.drawLine(index, -height / 2, index, height / 2, paint);
+
+//             Draw frequency value
+            canvas.scale(1, -1);
+            /**
+             * x=log(s/fps)/scale,反求s即是string s
+             */
+            String s = String.format(Locale.getDefault(), "%1.1fHz",
+                    (float) Math.pow(Math.E,index*xscale)*44100/4096);
+            paint.setTextSize(height / 24);
+            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setAntiAlias(true);
+            canvas.drawText(s, index, -height/2, paint);
+
+            String s_value = String.format(Locale.getDefault(), "%1.3fdB",
+                    value_arr[Math.round(index)]);
+//            canvas.drawText(s_value, index, height/2, paint);
+            canvas.drawText(s_value, index, -height/2-height/12, paint);
+//            // Get value
+//            int i = Math.round(index / xscale);
+//            if (i + xstart < audio.length)
+//            {
+//                float y = -audio.data[i + xstart] / yscale;
+//
+//                // Draw value
+//
+//                String s = String.format(Locale.getDefault(), "%3.2f",
+//                        audio.data[i + xstart] / 32768.0);
+//                cb.drawText(s, index, y, paint);
+//            }
+//
+//            paint.setTextAlign(Paint.Align.CENTER);
+//
+//            // Draw time value
+//            if (scale < 100.0)
+//            {
+//                String s = String.format(Locale.getDefault(),
+//                        (scale < 1.0) ? "%3.3f" :
+//                                (scale < 10.0) ? "%3.2f" : "%3.1f",
+//                        (start + (index * scale)) /
+//                                MainActivity.SMALL_SCALE);
+//                cb.drawText(s, index, height / 2, paint);
+//            }
+//
+//            else
+//            {
+//                String s = String.format(Locale.getDefault(), "%3.3f",
+//                        (start + (index * scale)) /
+//                                MainActivity.LARGE_SCALE);
+//                cb.drawText(s, index, height / 2, paint);
+//            }
+        }
 //        if (audio.frequency > 0.0) {
 //            // Yellow pen for frequency trace
-//            paint.setColor(Color.YELLOW);
+//            paint.setColor(Color.BLACK);
 //
 //            // Create line for frequency
 //            float x = (float) Math.log(audio.frequency / audio.fps) / xscale;
@@ -247,5 +317,31 @@ public class Spectrum extends View {
 //            paint.setAntiAlias(true);
 //            canvas.drawText(s, x, 0, paint);
 //        }
+        }
+    //     On touch event
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        float x = event.getX();
+        float y = event.getY();
+
+        // Set the index from the touch dimension
+        switch (event.getAction())
+        {
+            case MotionEvent.ACTION_DOWN:
+                index = x;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                index = x;
+                break;
+
+            case MotionEvent.ACTION_UP:
+                index = x;
+                break;
+        }
+
+        return true;
     }
-}
+    }
+
