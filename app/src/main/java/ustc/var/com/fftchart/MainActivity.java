@@ -20,6 +20,8 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     private Spectrum spectrum;
     private FreqScale scale;
     private TextView text;
+    private TextView text3;
+
     private Toast toast;
     private Unit unit;
     private SeekBar mSeekBar;
@@ -47,6 +49,8 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         scale = (FreqScale) findViewById(R.id.freqscale);
 //        unit = (Unit) findViewById(R.id.specunit);
         text = findViewById(R.id.textView2);
+        text3 = findViewById(R.id.textView3);
+
         mSeekBar = findViewById(R.id.seekBar);
         mSeekBar.setOnSeekBarChangeListener(this);
 
@@ -575,32 +579,38 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 /**
  * 计算1024个点的平均dB值
  */
-                for (int i = 0; i < STEP; i++)
-                    level += ((double) data[i] /1) *
-                            ((double) data[i] / 1);
-                level = level / STEP;
-                double dB = Math.log10(level) * 10.0;
-                final String s = String.format(Locale.getDefault(),
-                        "%1.1fdB", dB);
-                text.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        text.setText(s);
-                    }
-                });
-//                //16bit采样 2的16次方/2=32768
 //                for (int i = 0; i < STEP; i++)
-//                    level += ((double) data[i] / 32768.0) *
-//                            ((double) data[i] / 32768.0);
-//
-//                level = Math.sqrt(level / STEP) * 2.0;
-//
-//                double dB = Math.log10(level) * 20.0;
-//
-//                if (dB < -80.0)
-//                    dB = -80.0;
+//                    level += ((double) data[i] /1) *
+//                            ((double) data[i] / 1);
+//                level = level / STEP;
+//                double dB = Math.log10(level) * 10.0;
+//                final String s = String.format(Locale.getDefault(),
+//                        "%1.1fdB", dB);
+//                text.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        text.setText(s);
+//                    }
+//                });
+                //16bit采样 2的16次方/2=32768
+                for (int i = 0; i < STEP; i++)
+                    level += ((double) data[i] / 32768.0) *
+                            ((double) data[i] / 32768.0);
 
-//                // Update frequency and dB display
+                level = level / STEP;
+
+                double dB = Math.log10(level) * 10.0 +90;
+
+                double level2=0;
+               for (int i = 0; i < STEP; i++){
+
+                    level2 += ((double) data[i] /1) *
+                            ((double) data[i] / 1);
+               }
+                level2 = level2 / STEP;
+                double dB2 = Math.log10(level2) * 10.0;
+
+                // Update frequency and dB display
 //                if (max > MIN) {
 ////                    final String s = String.format(Locale.getDefault(),
 ////                            "%1.1fHz  %1.1fdB",
@@ -615,16 +625,19 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 //                        }
 //                    });
 //                } else {
-//                    frequency = 0.0;
-//                    final String s = String.format(Locale.getDefault(),
-//                            "%1.1fdB", dB);
-//                    text.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            text.setText(s);
-//                        }
-//                    });
-//                }
+                    frequency = 0.0;
+                    final String s = String.format(Locale.getDefault(),
+                            "%1.1fdB", dB);
+                final String s3 = String.format(Locale.getDefault(),
+                        "%1.1fdB", dB2);
+                    text.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            text.setText(s);
+                            text3.setText(s3);
+                        }
+                    });
+
             }
 
             // Stop and release the audio recorder
