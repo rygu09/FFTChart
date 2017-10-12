@@ -30,7 +30,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.Locale;
@@ -244,10 +243,10 @@ public class Spectrum extends View {
         if (index > 0 && index < width)
         {
             // Yellow index
-            paint.setColor(Color.BLACK);
+            paint.setColor(Color.BLUE);
 
             paint.setAntiAlias(false);
-            canvas.drawLine(index, -height / 2, index, height / 2, paint);
+            canvas.drawLine(index, 0, index, height , paint);
 
 //             Draw frequency value
             canvas.scale(1, -1);
@@ -256,6 +255,7 @@ public class Spectrum extends View {
              */
             String s = String.format(Locale.getDefault(), "%1.1fHz",
                     (float) Math.pow(Math.E,index*xscale)*44100/4096);
+            paint.setColor(Color.BLACK);
             paint.setTextSize(height / 24);
             paint.setTextAlign(Paint.Align.CENTER);
             paint.setAntiAlias(true);
@@ -319,29 +319,29 @@ public class Spectrum extends View {
 //        }
         }
     //     On touch event
-    @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
-        float x = event.getX();
-        float y = event.getY();
-
-        // Set the index from the touch dimension
-        switch (event.getAction())
-        {
-            case MotionEvent.ACTION_DOWN:
-                index = x;
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                index = x;
-                break;
-
-            case MotionEvent.ACTION_UP:
-                index = x;
-                break;
-        }
-
-        return true;
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event)
+//    {
+//        float x = event.getX();
+//        float y = event.getY();
+//
+//        // Set the index from the touch dimension
+//        switch (event.getAction())
+//        {
+//            case MotionEvent.ACTION_DOWN:
+//                index = x;
+//                break;
+//
+//            case MotionEvent.ACTION_MOVE:
+//                index = x;
+//                break;
+//
+//            case MotionEvent.ACTION_UP:
+//                index = x;
+//                break;
+//        }
+//
+//        return true;
+//    }
     }
 

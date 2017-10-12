@@ -9,18 +9,20 @@ import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
 
     private Spectrum spectrum;
     private FreqScale scale;
     private TextView text;
     private Toast toast;
     private Unit unit;
+    private SeekBar mSeekBar;
 
     private MenuItem lockItem;
 
@@ -45,6 +47,8 @@ public class MainActivity extends Activity {
         scale = (FreqScale) findViewById(R.id.freqscale);
 //        unit = (Unit) findViewById(R.id.specunit);
         text = findViewById(R.id.textView2);
+        mSeekBar = findViewById(R.id.seekBar);
+        mSeekBar.setOnSeekBarChangeListener(this);
 
         if (unit != null)
             unit.scale = 0;
@@ -247,6 +251,22 @@ public class MainActivity extends Activity {
         // Show it
         dialog.show();
     }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+          spectrum.index=i;
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+
 
     // Audio
     protected class Audio implements Runnable {
