@@ -1,8 +1,6 @@
 package ustc.var.com.fftchart;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -47,6 +45,9 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
         if (spectrum != null)
             spectrum.audio = audio;
+
+        if (scale != null)
+            scale.audio = audio;
     }
 
     // On Resume
@@ -194,74 +195,30 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                     AudioRecord.getMinBufferSize(sample,
                             AudioFormat.CHANNEL_IN_MONO,
                             AudioFormat.ENCODING_PCM_16BIT);
-            // Give up if it doesn't work
-            if (size == AudioRecord.ERROR_BAD_VALUE ||
-                    size == AudioRecord.ERROR ||
-                    size <= 0) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showAlert(R.string.app_name,
-                                R.string.error_buffer);
-                    }
-                });
-
-                thread = null;
-                return;
-            }
 
             // Create the AudioRecord object
-            try {
-                audioRecord =
-                        new AudioRecord(input, sample,
-                                AudioFormat.CHANNEL_IN_MONO,
-                                AudioFormat.ENCODING_PCM_16BIT,
-                                size);
-            }
-            // Exception
-            catch (Exception e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showAlert(R.string.app_name,
-                                R.string.error_init);
-                    }
-                });
+            audioRecord =
+                    new AudioRecord(input, sample,
+                            AudioFormat.CHANNEL_IN_MONO,
+                            AudioFormat.ENCODING_PCM_16BIT,
+                            size);
 
-                thread = null;
-                return;
-            }
-
-            // Check audiorecord
-            if (audioRecord == null) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showAlert(R.string.app_name,
-                                R.string.error_init);
-                    }
-                });
-
-                thread = null;
-                return;
-            }
-
-            // Check state
-            int state = audioRecord.getState();
-
-            if (state != AudioRecord.STATE_INITIALIZED) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showAlert(R.string.app_name,
-                                R.string.error_init);
-                    }
-                });
-
-                audioRecord.release();
-                thread = null;
-                return;
-            }
+//            // Check state
+//            int state = audioRecord.getState();
+//
+//            if (state != AudioRecord.STATE_INITIALIZED) {
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        showAlert(R.string.app_name,
+//                                R.string.error_init);
+//                    }
+//                });
+//
+//                audioRecord.release();
+//                thread = null;
+//                return;
+//            }
 
             // Calculate fps
             fps = (double) sample / SAMPLES;/*********  44100/4096 **********/

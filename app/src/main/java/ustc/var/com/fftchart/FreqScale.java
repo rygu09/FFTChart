@@ -84,7 +84,7 @@ public class FreqScale extends View
         {
             // Calculate scale
             //audio.xa.length=2048
-            float scale = (float) Math.log(audio.xa.length) / (float) width;
+            float scale = (float) Math.log(2048) / (float) width;
 
             // Set up paint
             paint.setStrokeWidth(2);
