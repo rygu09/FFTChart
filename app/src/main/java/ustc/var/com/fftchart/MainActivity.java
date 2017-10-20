@@ -8,10 +8,8 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -22,17 +20,9 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     private TextView text;
     private TextView text3;
 
-    private Toast toast;
-    private Unit unit;
     private SeekBar mSeekBar;
 
-    private MenuItem lockItem;
-
     private Audio audio;
-
-    private boolean screen;
-
-    private boolean isSR = false;
 
     protected static final int SIZE = 20;
     protected static final float SMALL_SCALE = 200;
@@ -47,138 +37,22 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
         spectrum = (Spectrum) findViewById(R.id.spectrum);
         scale = (FreqScale) findViewById(R.id.freqscale);
-//        unit = (Unit) findViewById(R.id.specunit);
         text = findViewById(R.id.textView2);
         text3 = findViewById(R.id.textView3);
 
         mSeekBar = findViewById(R.id.seekBar);
         mSeekBar.setOnSeekBarChangeListener(this);
 
-        if (unit != null)
-            unit.scale = 0;
-
-//        if (spectrum != null)
-//            spectrum.setOnClickListener(this);
-
-//        Intent intent=getIntent();
-//        Bundle bundle=intent.getExtras();
-//        isSR=bundle.getBoolean("isSR");
-//        if (isSR){
-//            spectrum.setSR();
-//        }
-
-//         Enable back navigation on action bar
-//        ActionBar actionBar = getActionBar();
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-//        actionBar.setTitle(R.string.spectrum);
-//
-//        actionBar.setCustomView(R.layout.text);
-//        actionBar.setDisplayShowCustomEnabled(true);
-//        text = (TextView) actionBar.getCustomView();
-
         audio = new Audio();
 
         if (spectrum != null)
             spectrum.audio = audio;
-
-        if (scale != null)
-            scale.audio = audio;
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.spectrum, menu);
-//
-//        lockItem = menu.findItem(R.id.action_lock);
-//
-//        return true;
-//    }
-//
-//    // On options item selected
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        Intent intent;
-//
-//        // Get id
-//        int id = item.getItemId();
-//        switch (id) {
-//            // Home
-//            case android.R.id.home:
-//                finish();
-//                break;
-//
-//            // Lock
-//            case R.id.action_lock:
-//                audio.lock = !audio.lock;
-//                item.setIcon(audio.lock ? R.drawable.lock_checked :
-//                        R.drawable.ic_action_secure);
-//                showToast(audio.lock ? R.string.lock_on : R.string.lock_off);
-//                break;
-//
-//            // Help
-//            case R.id.action_help:
-//                intent = new Intent(this, HelpActivity.class);
-//                startActivity(intent);
-//                break;
-//
-//            // Settings
-//            case R.id.action_settings:
-//                intent = new Intent(this, SettingsActivity.class);
-//                startActivity(intent);
-//                break;
-//
-//            default:
-//                return false;
-//        }
-//
-//        return true;
-//    }
-//
-//    // On click
-//    @Override
-//    public void onClick(View v) {
-//        // Get id
-//        int id = v.getId();
-//        switch (id) {
-//            // Spectrum
-//            case R.id.spectrum:
-//                audio.lock = !audio.lock;
-//                if (lockItem != null)
-//                    lockItem.setIcon(audio.lock ?
-//                            R.drawable.lock_checked :
-//                            R.drawable.ic_action_secure);
-//                showToast(audio.lock ? R.string.lock_on : R.string.lock_off);
-//                break;
-//        }
-//    }
-//
-//    // Show toast.
-//    void showToast(int key) {
-//        Resources resources = getResources();
-//        String text = resources.getString(key);
-//
-//        showToast(text);
-//    }
-//
-//    void showToast(String text) {
-//        // Cancel the last one
-//        if (toast != null)
-//            toast.cancel();
-//
-//        // Make a new one
-//        toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-//        toast.setGravity(Gravity.CENTER, 0, 0);
-//        toast.show();
-//    }
 
     // On Resume
     @Override
     protected void onResume() {
         super.onResume();
-
-//        // Get preferences
-//        getPreferences();
 
         // Start the audio thread
         audio.start();
@@ -188,74 +62,16 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     protected void onPause() {
         super.onPause();
 
-//        // Save preferences
-//        savePreferences();
-
         // Stop audio thread
         audio.stop();
     }
 
-    // Get preferences
-//    void getPreferences() {
-//        // Load preferences
-//        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-//
-//        SharedPreferences preferences =
-//                PreferenceManager.getDefaultSharedPreferences(this);
-//
-//        // Set preferences
-//        if (audio != null) {
-//            audio.input =
-//                    Integer.parseInt(preferences.getString(PREF_INPUT, "0"));
-//            audio.fill = preferences.getBoolean(PREF_FILL, true);
-//        }
-//
-//        screen = preferences.getBoolean(PREF_SCREEN, false);
-//
-//        // Check screen
-//        if (screen) {
-//            Window window = getWindow();
-//            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-//        } else {
-//            Window window = getWindow();
-//            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-//        }
-//    }
-//
-//    // Save preferences
-//    void savePreferences() {
-//        SharedPreferences preferences =
-//                PreferenceManager.getDefaultSharedPreferences(this);
-//
-//        // TODO
-//    }
-//
-    // Show alert
-    void showAlert(int appName, int errorBuffer) {
-        // Create an alert dialog builder
-        AlertDialog.Builder builder =
-                new AlertDialog.Builder(this);
-
-        // Set the title, message and button
-        builder.setTitle(appName);
-        builder.setMessage(errorBuffer);
-        builder.setNeutralButton(android.R.string.ok,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog,
-                                        int which) {
-                        // Dismiss dialog
-                        dialog.dismiss();
-                    }
-                });
-
-        // Create the dialog
-        AlertDialog dialog = builder.create();
-
-        // Show it
-        dialog.show();
-    }
-
+    /**
+     *
+     * @param seekBar
+     * @param i
+     * @param b
+     */
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
           spectrum.index=i;

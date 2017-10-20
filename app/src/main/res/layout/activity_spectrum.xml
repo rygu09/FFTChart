@@ -13,7 +13,7 @@
       android:layout_alignParentLeft="true" 
       android:layout_alignParentTop="true"
       android:paddingRight="2dp"
-      android:layout_alignBottom="@+id/spectrum" />
+      android:layout_alignBottom="@+id/freqscale" />
 
   <ustc.var.com.fftchart.Spectrum
       android:id="@+id/spectrum"

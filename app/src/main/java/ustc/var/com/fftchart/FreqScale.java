@@ -83,6 +83,7 @@ public class FreqScale extends View
         if ((audio != null) && (audio.xa != null))
         {
             // Calculate scale
+            //audio.xa.length=2048
             float scale = (float) Math.log(audio.xa.length) / (float) width;
 
             // Set up paint
@@ -90,6 +91,7 @@ public class FreqScale extends View
             paint.setColor(Color.BLACK);
             paint.setTextSize(height * 2 / 3);
             paint.setTextAlign(Paint.Align.CENTER);
+            paint.setAntiAlias(true);
 
             // Draw ticks
             canvas.drawLine(0, 0, 0, height / 3, paint);
@@ -101,9 +103,6 @@ public class FreqScale extends View
             {
                 for (float f : fa)
                 {
-//                    if ((f == 1) && (m == 10))
-//                        continue;
-
                     float x = (float) Math.log((f * m) / audio.fps) / scale;
                     canvas.drawLine(x, 0, x, height / 3, paint);
 
@@ -111,14 +110,11 @@ public class FreqScale extends View
                     if (m >= 1000)
                         s = String.format(Locale.getDefault(),
                                           "%1.0fK", f * m / 1000);
-
                     else
                         s = String.format(Locale.getDefault(),
                                           "%1.0f", f * m);
 
-                    paint.setAntiAlias(true);
                     canvas.drawText(s, x, height - (height / 6), paint);
-                    paint.setAntiAlias(false);
                 }
 
                 for (float s : sa)
@@ -128,7 +124,5 @@ public class FreqScale extends View
                 }
             }
         }
-
-//        canvas.drawText("freq", 0, height - (height / 6), paint);
     }
 }

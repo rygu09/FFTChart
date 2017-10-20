@@ -41,8 +41,6 @@ public class Scale extends View {
 
     private Paint paint;
 
-    protected MainActivity.Audio audio;
-
 
     // Constructor
     public Scale(Context context, AttributeSet attrs) {
@@ -76,6 +74,9 @@ public class Scale extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+
+        int index = 0;
+
         paint.setStrokeWidth(2);
         paint.setColor(Color.BLACK);
         paint.setTextSize(width * 1 / 2);
@@ -83,44 +84,14 @@ public class Scale extends View {
 //        canvas.translate(0, height);
 //        canvas.scale(1, -1);
 
+        float[] amplitude = {0,20, 40, 60, 80, 100};
 
-
-        int index = 0;
-        // Draw scale ticks
-
-        float yscale = 100 / height;
-
-//        float[] amplitude = {0,20, 40, 60, 80, 100,120,140,160};
-        float[] amplitude = {120, 100, 80, 60, 40, 20, 0};
-
-
-//        for (float a : amplitude) {
-//            float y = (float) (a / audio.fps / yscale);
-//            String s = String.format(Locale.getDefault(),
-//                    "%1.0f", a);
-//            canvas.drawText(s, y, 0, paint);
-//        }
-
-        for (int i = 4; i < height; i += MainActivity.SIZE *5) {
-
-//            canvas.drawLine(width * 4 / 5, i, width, i, paint);
+        for (int i = height-30; i >0; i -= MainActivity.SIZE *5) {
             String s = String.format(Locale.getDefault(),
                     "%1.0f", (float)amplitude[index]);
             canvas.drawText(s, 0, i, paint);
             index++;
         }
-
-
-//        String s = String.format(Locale.getDefault(),
-//                "%1.0f", f * m);
-//
-//        paint.setAntiAlias(true);
-//        canvas.drawText(s, x, height - (height / 6), paint);
-//        paint.setAntiAlias(false);
-//        paint.setAntiAlias(true);
-//        canvas.drawText(s, 0, width * 2 / 3, paint);
-
-
     }
 }
 

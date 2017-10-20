@@ -65,10 +65,6 @@ public class Spectrum extends View {
         paint = new Paint();
     }
 
-    public void setSR() {
-        isSR = true;
-    }
-
     // On size changed
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -82,9 +78,6 @@ public class Spectrum extends View {
     // On draw
     @Override
     protected void onDraw(Canvas canvas) {
-
-
-
         // Check for data
         if ((audio == null) || (audio.xa == null)) {
             canvas.drawColor(Color.BLACK);
@@ -110,11 +103,6 @@ public class Spectrum extends View {
             paint.setAntiAlias(false);
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(getResources().getColor(R.color.colorBackground));
-
-            // Draw graticule
-//            float fa[] = {1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f,
-//                    1.9f, 2, 2.2f, 2.5f, 3, 3.5f, 4, 4.5f, 5, 6, 7, 8, 9
-//            };
 
             //画背景竖线
             float fa[] = {1};
