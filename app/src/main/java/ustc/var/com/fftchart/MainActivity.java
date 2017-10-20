@@ -277,6 +277,8 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 /******* 将buffer[i]赋值给xr[i] ********/
                     // Normalise and window the input data
                     xr[i] = buffer[i] / norm * window;
+//                      xr[i] = buffer[i];
+
                 }
 
                 // do FFT
@@ -321,10 +323,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                 if (++counter % N != 0)
                     continue;
 
-                // Check display lock
-                if (lock)
-                    continue;
-
 /**重绘  Update spectrum
  * postInvalidate(); 与invalidate()方法区别就是，postInvalidate()方法可以在UI线程执行，也可以在工作线程执行
    而invalidate()只能在UI线程操作。但是从重绘速率讲：invalidate()效率高。
@@ -335,18 +333,18 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                 //每M个点重绘一次
                 if (counter % M != 0)
                     continue;
-
-                // Maximum FFT output
-                double max = 0.0;
-
-                // Find maximum value
-                for (int i = 1; i < RANGE; i++) {
-                    if (xa[i] > max) {
-                        max = xa[i];
-                        frequency = xf[i];
-                    }
-                }
-
+//
+//                // Maximum FFT output
+//                double max = 0.0;
+//
+//                // Find maximum value
+//                for (int i = 1; i < RANGE; i++) {
+//                    if (xa[i] > max) {
+//                        max = xa[i];
+//                        frequency = xf[i];
+//                    }
+//                }
+//
                 // Level
                 double level = 0.0;
 /**
@@ -375,41 +373,27 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                 double dB = Math.log10(level) * 10.0 +90;
 
                 double level2=0;
-               for (int i = 0; i < STEP; i++){
+                for (int i = 0; i < STEP; i++){
 
                     level2 += ((double) data[i] /1) *
                             ((double) data[i] / 1);
-               }
+                }
                 level2 = level2 / STEP;
                 double dB2 = Math.log10(level2) * 10.0;
 
-                // Update frequency and dB display
-//                if (max > MIN) {
-////                    final String s = String.format(Locale.getDefault(),
-////                            "%1.1fHz  %1.1fdB",
-////                            frequency, dB);
-//                    final String s = String.format(Locale.getDefault(),
-//                            "%1.1fHz",
-//                            frequency);
-//                    text.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            text.setText(s);
-//                        }
-//                    });
-//                } else {
-                    frequency = 0.0;
-                    final String s = String.format(Locale.getDefault(),
+
+                frequency = 0.0;
+                final String s = String.format(Locale.getDefault(),
                             "%1.1fdB", dB);
                 final String s3 = String.format(Locale.getDefault(),
-                        "%1.1fdB", dB2);
-                    text.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            text.setText(s);
-                            text3.setText(s3);
-                        }
-                    });
+                            "%1.1fdB", dB2);
+                text.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        text.setText(s);
+                        text3.setText(s3);
+                    }
+                });
 
             }
 
