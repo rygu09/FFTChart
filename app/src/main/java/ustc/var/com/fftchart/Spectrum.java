@@ -49,11 +49,7 @@ public class Spectrum extends View {
 
     protected MainActivity.Audio audio;
 
-    private boolean isSR = false;
-
     protected float index;
-    protected float start;
-
 
     // Spectrum
     public Spectrum(Context context, AttributeSet attrs) {
@@ -131,18 +127,18 @@ public class Spectrum extends View {
             max = 1.0f;
 
         // Calculate the scaling
-        float yscale = (height / max);
+        float yscale = (height / 100);
 
         max = 0.0f;
 
         // Rewind path
-        //path.rewind():清除掉path里的线条和曲线，但是会保留内部的数据结构以便重用；
+        // path.rewind():清除掉path里的线条和曲线，但是会保留内部的数据结构以便重用；
         path.rewind();
         path.moveTo(0, 0);
 
         // Create trace
         int last = 1;
-        float[] value_arr=new float[Math.round(width)];
+        float[] value_arr = new float[Math.round(width)];
         for (int x = 0; x < width; x++) {
             float value = 0.0f;
 
@@ -152,57 +148,22 @@ public class Spectrum extends View {
 
             for (int i = last; i <= index; i++) {
                 // Don't show DC component and don't overflow
-                if (i > 0 && i < audio.xa.length) {
-                    if (value < audio.xa[i])
-                        value = (float) audio.xa[i];
-
-                    if (isSR) {
-                        if (x > width / 2) {
-                            value = value / 2;
-                        }
-                        if (x > width / 1.75) {
-                            value = value / 4;
-                        }
-                        if (x > width / 1.5) {
-                            value = value / 8;
-                        }
-                    }
+                if (i > 0 && i < audio.level_dB_fft.length) {
+                    if (value < audio.level_dB_fft[i])
+                        value = (float) audio.level_dB_fft[i];
                 }
-                value = value / 1.5f;
-
             }
 
             // Update last index
             last = index;
 
-            // Get max value
-//            if (max < value)
-//                max = value;
-
-            value_arr[x]=value*yscale;
+            value_arr[x] = value * yscale;
             float y = value * yscale;//float yscale = (height / max);
 
             path.lineTo(x, y);//lineTo(float x, float y) //添加当前点到目标点（x，y）构成的直线到path
         }
 
         paint.setAntiAlias(true);
-
-        // Fill
-//        if (audio.fill) {
-//            // Copy path
-//            fillPath.set(path);
-//
-//            // Complete path for fill
-//            fillPath.lineTo(width, 0);
-//            fillPath.close();
-//
-//            // Colour translucent green
-//            paint.setColor(Color.argb(63, 0, 255, 0));
-//            paint.setStyle(Paint.Style.FILL);
-//
-//            // Fill path
-//            canvas.drawPath(fillPath, paint);
-//        }
 
         //始终填充
         // Copy path
@@ -228,13 +189,12 @@ public class Spectrum extends View {
         canvas.drawPath(path, paint);
 
         // Draw index
-        if (index > 0 && index < width)
-        {
+        if (index > 0 && index < width) {
             // Yellow index
             paint.setColor(Color.BLUE);
 
             paint.setAntiAlias(false);
-            canvas.drawLine(index, 0, index, height , paint);
+            canvas.drawLine(index, 0, index, height, paint);
 
 //             Draw frequency value
             canvas.scale(1, -1);
@@ -242,94 +202,18 @@ public class Spectrum extends View {
              * x=log(s/fps)/scale,反求s即是string s
              */
             String s = String.format(Locale.getDefault(), "%1.1fHz",
-                    (float) Math.pow(Math.E,index*xscale)*44100/4096);
+                    (float) Math.pow(Math.E, index * xscale) * 44100 / 4096);
             paint.setColor(Color.BLACK);
             paint.setTextSize(height / 24);
             paint.setTextAlign(Paint.Align.CENTER);
             paint.setAntiAlias(true);
-            canvas.drawText(s, index, -height/2, paint);
+            canvas.drawText(s, index, -height / 2, paint);
 
             String s_value = String.format(Locale.getDefault(), "%1.3fdB",
                     value_arr[Math.round(index)]);
-//            canvas.drawText(s_value, index, height/2, paint);
-            canvas.drawText(s_value, index, -height/2-height/12, paint);
-//            // Get value
-//            int i = Math.round(index / xscale);
-//            if (i + xstart < audio.length)
-//            {
-//                float y = -audio.data[i + xstart] / yscale;
-//
-//                // Draw value
-//
-//                String s = String.format(Locale.getDefault(), "%3.2f",
-//                        audio.data[i + xstart] / 32768.0);
-//                cb.drawText(s, index, y, paint);
-//            }
-//
-//            paint.setTextAlign(Paint.Align.CENTER);
-//
-//            // Draw time value
-//            if (scale < 100.0)
-//            {
-//                String s = String.format(Locale.getDefault(),
-//                        (scale < 1.0) ? "%3.3f" :
-//                                (scale < 10.0) ? "%3.2f" : "%3.1f",
-//                        (start + (index * scale)) /
-//                                MainActivity.SMALL_SCALE);
-//                cb.drawText(s, index, height / 2, paint);
-//            }
-//
-//            else
-//            {
-//                String s = String.format(Locale.getDefault(), "%3.3f",
-//                        (start + (index * scale)) /
-//                                MainActivity.LARGE_SCALE);
-//                cb.drawText(s, index, height / 2, paint);
-//            }
+            canvas.drawText(s_value, index, -height / 2 - height / 12, paint);
+
         }
-//        if (audio.frequency > 0.0) {
-//            // Yellow pen for frequency trace
-//            paint.setColor(Color.BLACK);
-//
-//            // Create line for frequency
-//            float x = (float) Math.log(audio.frequency / audio.fps) / xscale;
-//            paint.setAntiAlias(false);
-//            canvas.drawLine(x, 0, x, height / 4, paint);
-//
-//            // Draw frequency value
-//            canvas.scale(1, -1);
-//            String s = String.format(Locale.getDefault(), "%1.1fHz",
-//                    audio.frequency);
-//            paint.setTextSize(height / 48);
-//            paint.setTextAlign(Paint.Align.CENTER);
-//            paint.setAntiAlias(true);
-//            canvas.drawText(s, x, 0, paint);
-//        }
-        }
-    //     On touch event
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event)
-//    {
-//        float x = event.getX();
-//        float y = event.getY();
-//
-//        // Set the index from the touch dimension
-//        switch (event.getAction())
-//        {
-//            case MotionEvent.ACTION_DOWN:
-//                index = x;
-//                break;
-//
-//            case MotionEvent.ACTION_MOVE:
-//                index = x;
-//                break;
-//
-//            case MotionEvent.ACTION_UP:
-//                index = x;
-//                break;
-//        }
-//
-//        return true;
-//    }
     }
+}
 
