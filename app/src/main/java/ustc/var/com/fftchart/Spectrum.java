@@ -82,6 +82,9 @@ public class Spectrum extends View {
 
         // Calculate x scale
         float xscale = (float) Math.log(audio.level_dB_fft.length) / width;
+        // Calculate the scaling
+        //canvas y坐标的最大值 大概取了下100
+        float yscale = (height / 100);
 
         // Create graticule
         if (graticule == null || graticule.getWidth() != width ||
@@ -96,15 +99,20 @@ public class Spectrum extends View {
 
             // Set up paint
             paint.setStrokeWidth(2);
-            paint.setAntiAlias(false);
+            paint.setAntiAlias(true);
             paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(getResources().getColor(R.color.colorBackground));
+            paint.setColor(Color.argb(30,0,0,0));
 
             //画背景竖线
             float fa[] = {1};
             float ma[] = {1, 10, 100, 1000, 10000};
             for (float m : ma) {
                 for (float f : fa) {
+                    /**
+                     * x其实是 第几个点对应的 手机屏幕中的位置
+                     * 如Fn=(n-1)*Fs/N, Fn是实际频率点，
+                     * x=width* log(Fn/ (44100/4096) )/ log2048
+                     */
                     float x = (float) Math.log((f * m) / audio.fps) / xscale;
                     c.drawLine(x, 0, x, height, paint);
                 }
@@ -115,105 +123,116 @@ public class Spectrum extends View {
                 c.drawLine(0, i, width, i, paint);
             }
         }
-
         canvas.translate(0, height);
         canvas.scale(1, -1);
 
         // Draw the graticule
         canvas.drawBitmap(graticule, 0, 0, null);
 
-        // Check max value
-        if (max < 1.0f)
-            max = 1.0f;
-
-        // Calculate the scaling
-        float yscale = (height / 100);
-
-        max = 0.0f;
-
-        // Rewind path
-        // path.rewind():清除掉path里的线条和曲线，但是会保留内部的数据结构以便重用；
-        path.rewind();
-        path.moveTo(0, 0);
-
-        // Create trace
-        int last = 1;
-        float[] value_arr = new float[Math.round(width)];
-        for (int x = 0; x < width; x++) {
-            float value = 0.0f;
-
-            int index = (int) Math.round(Math.pow(Math.E, x * xscale));
-            if (index == last)
-                continue;
-
-            for (int i = last; i <= index; i++) {
-                // Don't show DC component and don't overflow
-                if (i > 0 && i < audio.level_dB_fft.length) {
-                    if (value < audio.level_dB_fft[i])
-                        value = (float) audio.level_dB_fft[i];
-                }
-            }
-
-            // Update last index
-            last = index;
-
-            value_arr[x] = value * yscale;
-            float y = value * yscale;//float yscale = (height / max);
-
-            path.lineTo(x, y);//lineTo(float x, float y) //添加当前点到目标点（x，y）构成的直线到path
-        }
-
-        paint.setAntiAlias(true);
-
-        //始终填充
-        // Copy path
-        fillPath.set(path);
-
-        // Complete path for fill
-        fillPath.lineTo(width, 0);
-        fillPath.close();
-
-        // Colour translucent green
-        paint.setColor(Color.argb(63, 255, 0, 0));
-        paint.setStyle(Paint.Style.FILL);
-
-        // Fill path
-        canvas.drawPath(fillPath, paint);
-
-
-        // Color green
+//        // Rewind path
+//        // path.rewind():清除掉path里的线条和曲线，但是会保留内部的数据结构以便重用；
+//        path.rewind();
+//        path.moveTo(0, 0);
+/**
+ * ------------------      画数据       ---------------------------
+ */
+        double[] fn=new double[2048];
+        double[] x_fn=new double[2048];
         paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.STROKE);
-
-        // Draw path
-        canvas.drawPath(path, paint);
+        paint.setStrokeWidth(3.5f);
+//        paint.setStyle(Paint.Style.FILL);
+        for(int i=0;i<2048;i++){
+            fn[i]=(i-1)*44100/4096;
+            x_fn[i]=Math.log(fn[i] / audio.fps) / xscale;
+            canvas.drawLine((float) x_fn[i], 0, (float) x_fn[i], (float) audio.level_dB_fft[i]*yscale, paint);
+        }
 
         // Draw index
         if (index > 0 && index < width) {
             // Yellow index
-            paint.setColor(Color.BLUE);
-
-            paint.setAntiAlias(false);
-            canvas.drawLine(index, 0, index, height, paint);
+            paint.setColor(Color.argb(200,0,0,255));
+            paint.setStrokeWidth(1.8f);
+            float gap=6f;
+            canvas.drawLine(index-gap, 0, index-gap, height-10, paint);
+            canvas.drawLine(index+gap, 0, index+gap, height-10, paint);
+            canvas.drawLine(index-gap, height-10, index+gap, height-10, paint);
 
 //             Draw frequency value
             canvas.scale(1, -1);
             /**
-             * x=log(s/fps)/scale,反求s即是string s
+             * x=log(s/fps)/scale,反求s即是string s,s为频率
              */
+            float frequency=(float) Math.pow(Math.E, index * xscale) * 44100 / 4096;
             String s = String.format(Locale.getDefault(), "%1.1fHz",
-                    (float) Math.pow(Math.E, index * xscale) * 44100 / 4096);
+                    frequency);
+            paint.setStrokeWidth(2);
             paint.setColor(Color.BLACK);
-            paint.setTextSize(height / 24);
+            paint.setStyle(Paint.Style.FILL_AND_STROKE);
+            paint.setTextSize(height /16);
             paint.setTextAlign(Paint.Align.CENTER);
-            paint.setAntiAlias(true);
             canvas.drawText(s, index, -height / 2, paint);
 
-            String s_value = String.format(Locale.getDefault(), "%1.3fdB",
-                    value_arr[Math.round(index)]);
+            int n=Math.round(frequency/(44100/4096)+1);
+
+            String s_value = String.format(Locale.getDefault(), "%1.1fdB",
+                    (float) audio.level_dB_fft[n]);
             canvas.drawText(s_value, index, -height / 2 - height / 12, paint);
 
         }
+
+//        // Create trace
+//        int last = 1;
+//        float[] value_arr = new float[Math.round(width)];
+//        for (int x = 0; x < width; x++) {
+//            float value = 0.0f;
+//
+//            int index = (int) Math.round(Math.pow(Math.E, x * xscale));
+//            if (index == last)
+//                continue;
+//
+//            for (int i = last; i <= index; i++) {
+//                // Don't show DC component and don't overflow
+//                if (i > 0 && i < audio.level_dB_fft.length) {
+//                    if (value < audio.level_dB_fft[i])
+//                        value = (float) audio.level_dB_fft[i];
+//                }
+//            }
+//
+//            // Update last index
+//            last = index;
+//
+//            value_arr[x] = value * yscale;
+//            float y = value * yscale;//float yscale = (height / max);
+//
+//            path.lineTo(x, y);//lineTo(float x, float y) //添加当前点到目标点（x，y）构成的直线到path
+//        }
+//
+//        paint.setAntiAlias(true);
+//
+//        //始终填充
+//        // Copy path
+//        fillPath.set(path);
+//
+//        // Complete path for fill
+//        fillPath.lineTo(width, 0);
+//        fillPath.close();
+//
+//        // Colour translucent green
+//        paint.setColor(Color.argb(63, 255, 0, 0));
+//        paint.setStyle(Paint.Style.FILL);
+//
+//        // Fill path
+//        canvas.drawPath(fillPath, paint);
+//
+//
+//        // Color green
+//        paint.setColor(Color.RED);
+//        paint.setStyle(Paint.Style.STROKE);
+//
+//        // Draw path
+//        canvas.drawPath(path, paint);
+//
+
     }
 }
 
