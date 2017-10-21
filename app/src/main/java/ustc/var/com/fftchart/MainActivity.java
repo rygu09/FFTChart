@@ -124,6 +124,8 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         private double xr[];
         private double xi[];
 
+        protected double[] level_dB_fft;
+
         protected double xa[];
 
         private double xp[];
@@ -137,6 +139,8 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
             xr = new double[SAMPLES];/**  xr[4096]   */
             xi = new double[SAMPLES];/**  xi[4096]   */
+
+            level_dB_fft = new double[RANGE];
 
             xa = new double[RANGE];/**  xa[2048]   */
             xp = new double[RANGE];
@@ -254,32 +258,52 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                 for (int i = 0; i < STEP; i++)
                     buffer[(SAMPLES - STEP) + i] = data[i];
 
-                // Maximum value
-                if (dmax < 4096.0)
-                    dmax = 4096.0;
+                for (int i = 0; i < SAMPLES; i++)
+                    xr[i] = buffer[i];
 
-                // Calculate normalising value
-                //计算归一化值
-                double norm = dmax;
-
-                dmax = 0.0;
-
-                // Copy data to FFT input arrays
-                for (int i = 0; i < SAMPLES; i++) {
-                    // Find the magnitude
-                    if (dmax < Math.abs(buffer[i]))
-                        dmax = Math.abs(buffer[i]);
-
-                    // Calculate the window
-                    double window =
-                            0.5 - 0.5 * Math.cos(2.0 * Math.PI *
-                                    i / SAMPLES);
-/******* 将buffer[i]赋值给xr[i] ********/
-                    // Normalise and window the input data
-                    xr[i] = buffer[i] / norm * window;
-//                      xr[i] = buffer[i];
-
+                Complex[] data_need_process=new Complex[4096];
+                for (int i = 0; i < data_need_process.length; i++) {
+                    data_need_process[i] = new Complex(xr[i], xi[i]);
                 }
+
+                Complex[] Y = fft(data_need_process);
+
+
+                // Process FFT output
+                for (int i = 0; i < RANGE; i++) {
+                    xa[i] = Y[i].abs(); //取模
+                    xa[i] = xa[i]/(SAMPLES/2);//换算成实际幅值
+                    level_dB_fft[i] =10.0* Math.log10(( xa[i] /1) *( xa[i] /1));
+                }
+
+//                // Maximum value
+//                if (dmax < 4096.0)
+//                    dmax = 4096.0;
+//
+//                // Calculate normalising value
+//                //计算归一化值
+//                double norm = dmax;
+//
+//                dmax = 0.0;
+//
+//                // Copy data to FFT input arrays
+//                for (int i = 0; i < SAMPLES; i++) {
+//                    // Find the magnitude
+//                    if (dmax < Math.abs(buffer[i]))
+//                        dmax = Math.abs(buffer[i]);
+//
+//                    // Calculate the window
+//                    double window =
+//                            0.5 - 0.5 * Math.cos(2.0 * Math.PI *
+//                                    i / SAMPLES);
+///******* 将buffer[i]赋值给xr[i] ********/
+//                    // Normalise and window the input data
+//                    xr[i] = buffer[i] / norm * window;
+////                      xr[i] = buffer[i];
+//
+//                }
+
+
 
                 // do FFT
                 fftr(xr, xi);
@@ -363,12 +387,21 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 //                        text.setText(s);
 //                    }
 //                });
-                //16bit采样 2的16次方/2=32768
-                for (int i = 0; i < STEP; i++)
-                    level += ((double) data[i] / 32768.0) *
-                            ((double) data[i] / 32768.0);
+//                //16bit采样 2的16次方/2=32768
+//                for (int i = 0; i < STEP; i++)
+//                    level += ((double) data[i] / 32768.0) *
+//                            ((double) data[i] / 32768.0);
+//
+//                level = level / STEP;
+//
+//                double dB = Math.log10(level) * 10.0 +90;
 
-                level = level / STEP;
+                //16bit采样 2的16次方/2=32768
+                for (int i = 0; i < SAMPLES; i++)
+                    level += ((double) buffer[i] / 32768.0) *
+                            ((double) buffer[i] / 32768.0);
+
+                level = level / SAMPLES;
 
                 double dB = Math.log10(level) * 10.0 +90;
 
@@ -399,6 +432,40 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
             // Stop and release the audio recorder
             cleanUpAudioRecord();
+        }
+
+        private Complex[] fft(Complex[] x) {
+            int N = x.length;
+
+            // base case
+            if (N == 1) return new Complex[] { x[0] };
+
+            // radix 2 Cooley-Tukey FFT
+            if (N % 2 != 0) { throw new RuntimeException("N is not a power of 2"); }
+
+            // fft of even terms
+            Complex[] even = new Complex[N/2];
+            for (int k = 0; k < N/2; k++) {
+                even[k] = x[2*k];
+            }
+            Complex[] q = fft(even);
+
+            // fft of odd terms
+            Complex[] odd  = even;  // reuse the array
+            for (int k = 0; k < N/2; k++) {
+                odd[k] = x[2*k + 1];
+            }
+            Complex[] r = fft(odd);
+
+            // combine
+            Complex[] y = new Complex[N];
+            for (int k = 0; k < N/2; k++) {
+                double kth = -2 * k * Math.PI / N;
+                Complex wk = new Complex(Math.cos(kth), Math.sin(kth));
+                y[k]       = q[k].plus(wk.times(r[k]));
+                y[k + N/2] = q[k].minus(wk.times(r[k]));
+            }
+            return y;
         }
 
         /**

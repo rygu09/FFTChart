@@ -79,13 +79,13 @@ public class Spectrum extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         // Check for data
-        if ((audio == null) || (audio.xa == null)) {
+        if ((audio == null) || (audio.level_dB_fft == null)) {
             canvas.drawColor(Color.BLACK);
             return;
         }
 
         // Calculate x scale
-        float xscale = (float) Math.log(audio.xa.length) / width;
+        float xscale = (float) Math.log(audio.level_dB_fft.length) / width;
 
         // Create graticule
         if (graticule == null || graticule.getWidth() != width ||
