@@ -148,8 +148,9 @@ public class Spectrum extends View {
         }
 
         // Draw index
+        //就是seekbar滑动时在频谱canvas中滑动的竖线
         if (index > 0 && index < width) {
-            // Yellow index
+            // Blue index
             paint.setColor(Color.argb(200,0,0,255));
             paint.setStrokeWidth(1.8f);
             float gap=6f;
