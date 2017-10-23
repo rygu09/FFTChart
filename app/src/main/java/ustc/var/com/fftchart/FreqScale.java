@@ -33,8 +33,8 @@ import android.view.View;
 import java.util.Locale;
 
 // FreqScale
-public class FreqScale extends View
-{
+public class FreqScale extends View {
+
     private static final int HEIGHT_FRACTION = 16;
     private int width;
     private int height;
@@ -44,8 +44,7 @@ public class FreqScale extends View
     protected MainActivity.Audio audio;
 
     // Constructor
-    public FreqScale(Context context, AttributeSet attrs)
-    {
+    public FreqScale(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         // Create paint
@@ -54,8 +53,7 @@ public class FreqScale extends View
 
     // onMeasure
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         // Get offered dimension
@@ -66,8 +64,7 @@ public class FreqScale extends View
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh)
-    {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
         // Get actual dimensions
@@ -77,11 +74,9 @@ public class FreqScale extends View
 
     // onDraw
     @Override
-    protected void onDraw(Canvas canvas)
-    {
+    protected void onDraw(Canvas canvas) {
         // Check for data
-        if ((audio != null) && (audio.xa != null))
-        {
+        if ((audio != null) && (audio.xa != null)) {
             // Calculate scale
             //audio.xa.length=2048
             float scale = (float) Math.log(2048) / (float) width;
@@ -97,28 +92,25 @@ public class FreqScale extends View
             canvas.drawLine(0, 0, 0, height / 3, paint);
 
             float fa[] = {1};
-            float sa[] = {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f };
+            float sa[] = {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f};
             float ma[] = {100, 1000, 10000};
-            for (float m : ma)
-            {
-                for (float f : fa)
-                {
+            for (float m : ma) {
+                for (float f : fa) {
                     float x = (float) Math.log((f * m) / audio.fps) / scale;
                     canvas.drawLine(x, 0, x, height / 3, paint);
 
                     String s;
                     if (m >= 1000)
                         s = String.format(Locale.getDefault(),
-                                          "%1.0fK", f * m / 1000);
+                                "%1.0fK", f * m / 1000);
                     else
                         s = String.format(Locale.getDefault(),
-                                          "%1.0f", f * m);
+                                "%1.0f", f * m);
 
                     canvas.drawText(s, x, height - (height / 6), paint);
                 }
 
-                for (float s : sa)
-                {
+                for (float s : sa) {
                     float x = (float) Math.log((s * m) / audio.fps) / scale;
                     canvas.drawLine(x, 0, x, height / 6, paint);
                 }
